@@ -13,13 +13,20 @@ This tool allows users to interact with a dataset of car advertisements, explori
 To launch this project on your local machine, follow these steps:
 
 1. **Clone the Repository**: Clone this repository to your local machine using the following command:
-```git clone https://github.com/yourusername/sprint-6-project.git```
+```
+git clone https://github.com/yourusername/sprint-6-project.git
+```
 
 2. **Install Dependencies**: Navigate to the project directory and install the necessary dependencies by running:
-```pip install -r requirements.txt```
+```
+pip install -r requirements.txts
+```
 
 3. Run the Application: Execute the Streamlit application using the following command:
-```streamlit run your_script_name.py```
+
+```
+streamlit run app.py
+```
 
 4. Replace app.py with the name of your Python script containing the Streamlit code.
 
