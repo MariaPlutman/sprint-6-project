@@ -1,9 +1,12 @@
 import plotly.express as px
 import pandas as pd
 import streamlit as st
+import os
 
 # Read data from the CSV file
-data = pd.read_csv('/Users/user/Documents/GitHub/sprint-6-project/vehicles_upd.csv')
+current_directory = os.getcwd()
+relative_path = 'vehicles_upd.csv'
+data = pd.read_csv(relative_path )
 
 st.title('Car advertisement dataset')
 
