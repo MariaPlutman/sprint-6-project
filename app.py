@@ -1,7 +1,6 @@
 import plotly.express as px
 import pandas as pd
 import streamlit as st
-import numpy as np
 
 # Read data from the CSV file
 data = pd.read_csv('/Users/user/Documents/GitHub/sprint-6-project/vehicles_upd.csv')
