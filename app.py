@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 
 # Read data from the CSV file
-data = pd.read_csv('/Users/user/Documents/GitHub/sprint-6-project/vehicles_upd.csv')
+data = pd.read_csv('vehicles_upd.csv')
 
 st.title('Car advertisement dataset')
 
