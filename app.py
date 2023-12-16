@@ -1,48 +1,42 @@
 import plotly.express as px
 import pandas as pd
 import streamlit as st
-import yfinance as yf
+import numpy as np
 
 # Read data from the CSV file
-data = pd.read_csv('/Users/user/Documents/GitHub/sprint-6-project/vehicles_us.csv')
+data = pd.read_csv('/Users/user/Documents/GitHub/sprint-6-project/vehicles_upd.csv')
 
 st.title('Car advertisement dataset')
 
-st.sidebar.header('User Input Features')
-st.dataframe(data)
-# Create a sidebar select box with unique model years
-columns_to_select = {
-    'Vehicles Model': 'model',
-    'Model Year' : 'model_year',
-    'Condition': 'condition',
-    'Cylinders': 'cylinders',
-    'Fuel': 'fuel',
-    'Transmission': 'transmission',
-    'Vehicle Type': 'type',
-    'Is 4wd': 'is_4wd',
-    'Date Posted' : 'date_posted'
-}
+# Sidebar for sorting options
+sort_column = st.selectbox('Select column to sort by', data.columns)
+sort_order = st.radio('Select sorting order', ['Ascending', 'Descending'])
 
-# Iterate through the dictionary keys and create select boxes in the sidebar
-for label, column in columns_to_select.items():
-    options = data[column].unique()
-    selected_value = st.sidebar.selectbox(label, list(reversed(sorted(options))))
+# Convert sorting order to boolean for ascending or descending
+ascending = True if sort_order == 'Ascending' else False
 
-columns_to_slide = {
-    'Price' : 'price',
-    'Odometer' : 'odometer',
-    'Days Listed' : 'days_listed'
-}
+# Checkbox for filtering specific models
+selected_models = st.multiselect('Select models to filter', data['model'].unique())
 
-# Iterate through the dictionary keys and create sliders in the sidebar
-for label, column in columns_to_slide.items():
-    # Check if the values in the column are numeric before extracting minimum and maximum
-    if pd.api.types.is_numeric_dtype(data[column]):
-        min_value = int(data[column].min())
-        max_value = int(data[column].max())
-        selected_value = st.sidebar.slider(label, min_value=min_value, max_value=max_value)
-    else:
-        st.sidebar.write(f"The '{column}' column contains non-numeric data.")
+# Checkbox for filtering by price range
+filter_price = st.checkbox('Filter by Price Range')
+if filter_price:
+    min_price = st.number_input('Minimum Price', min_value=data['price'].min(), max_value=data['price'].max())
+    max_price = st.number_input('Maximum Price', min_value=data['price'].min(), max_value=data['price'].max())
+    data = data[(data['price'] >= min_price) & (data['price'] <= max_price)]
+
+# Filter DataFrame based on selected models
+if selected_models:
+    filtered_df = data[data['model'].isin(selected_models)]
+else:
+    filtered_df = data.copy()  # If no models selected, show the entire DataFrame
+
+
+# Sort the filtered DataFrame based on user-selected column and order
+sorted_df = filtered_df.sort_values(by=sort_column, ascending=ascending)
+
+# Display the sorted DataFrame
+st.write(sorted_df)
 
 
 st.header('Histogram of Model VS Price')
@@ -61,15 +55,20 @@ fig.update_layout(barmode='overlay')  # Overlay bars for better visibility
 
 st.plotly_chart(fig)
 
-# Create the scatter plot with Plotly Express
-fig = px.scatter(data, x='model_year', y='type', color='model',
-                 title='Comparison of Models by Type and Model Year',
-                 labels={'model_year': 'Model Year', 'type': 'Type', 'model': 'Model'},
-                 hover_data=data.columns)
+# Create a scatter plot using Plotly Express with color and hover interactions
+scatter_fig = px.scatter(
+    data, 
+    x='model_year', 
+    y='price', 
+    color='model', 
+    title='Car Prices Over Years',
+    hover_name='model',  # Show model name on hover
+    hover_data={'model_year': True, 'price': True},  # Show year and price on hover
+    labels={'year': 'year', 'price': 'price'},  # Customize axis labels
+)
 
-fig.update_traces(marker=dict(size=12, opacity=0.8, line=dict(width=2, color='DarkSlateGrey')))
+# Customize the appearance of the plot
+scatter_fig.update_traces(marker=dict(size=12, line=dict(width=2, color='DarkSlateGrey')), selector=dict(mode='markers'))
 
-fig.update_layout(xaxis_title='Model Year', yaxis_title='Type')
-
-# Display the chart using st.plotly_chart()
-st.plotly_chart(fig)
+# Display the scatter plot using st.plotly_chart
+st.plotly_chart(scatter_fig)
