@@ -35,3 +35,7 @@ streamlit run app.py
 ## Notes
 Ensure that the CSV file vehicles_us.csv is present in the correct directory or update the file path in the code accordingly.
 You may need to modify the data reading and visualization code to fit your specific dataset structure and requirements.
+
+### Accessing the Application
+
+To access the application, simply click [here](https://sprint-6-project-4mrm.onrender.com).
