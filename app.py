@@ -6,7 +6,7 @@ import os
 # Read data from the CSV file
 current_directory = os.getcwd()
 relative_path = 'vehicles_upd.csv'
-data = pd.read_csv(relative_path )
+data = pd.read_csv(relative_path)
 
 st.title('Car advertisement dataset')
 
@@ -57,20 +57,38 @@ fig.update_layout(barmode='overlay')  # Overlay bars for better visibility
 
 st.plotly_chart(fig)
 
-# Create a scatter plot using Plotly Express with color and hover interactions
+st.header('Car Prices Over Years')
+# Define columns to remove outliers from
+columns_to_remove_outliers = ['model_year', 'price']
+
+# Calculate IQR for specified columns
+Q1 = data[columns_to_remove_outliers].quantile(0.25)
+Q3 = data[columns_to_remove_outliers].quantile(0.75)
+IQR = Q3 - Q1
+
+# Filter data to remove outliers
+data_no_outliers = data[~((data[columns_to_remove_outliers] < (Q1 - 1.5 * IQR)) | (data[columns_to_remove_outliers] > (Q3 + 1.5 * IQR))).any(axis=1)]
+
+# Get unique models for the multiselect dropdown
+unique_models = data_no_outliers['model'].unique().tolist()
+
+# Create a multiselect dropdown for model selection
+selected_models = st.multiselect("Select models to display", unique_models, default=[])
+
+filtered_data = data_no_outliers[data_no_outliers['model'].isin(selected_models)]
+
 scatter_fig = px.scatter(
-    data, 
+    filtered_data, 
     x='model_year', 
     y='price', 
-    color='model', 
-    title='Car Prices Over Years',
-    hover_name='model',  # Show model name on hover
-    hover_data={'model_year': True, 'price': True},  # Show year and price on hover
-    labels={'year': 'year', 'price': 'price'},  # Customize axis labels
+    color='model',
+    hover_name='model',  
+    hover_data={'model_year': True, 'price': True},  
+    labels={'model_year': 'Year', 'price': 'Price'}, 
 )
 
 # Customize the appearance of the plot
 scatter_fig.update_traces(marker=dict(size=12, line=dict(width=2, color='DarkSlateGrey')), selector=dict(mode='markers'))
 
-# Display the scatter plot using st.plotly_chart
+# Display the scatter plot without outliers using st.plotly_chart
 st.plotly_chart(scatter_fig)
